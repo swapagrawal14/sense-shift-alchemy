@@ -1,24 +1,733 @@
+
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>sense-shift-alchemy</title>
-    <meta name="description" content="Lovable Generated Project" />
-    <meta name="author" content="Lovable" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Synesthesia Simulator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    <meta property="og:title" content="sense-shift-alchemy" />
-    <meta property="og:description" content="Lovable Generated Project" />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            transition: background 0.8s ease;
+            overflow-x: hidden;
+        }
 
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@lovable_dev" />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
-  </head>
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
 
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .title {
+            font-size: 3rem;
+            font-weight: 300;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: rgba(255,255,255,0.9);
+            font-weight: 300;
+            margin-bottom: 30px;
+        }
+
+        .api-section {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .api-input {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.9);
+            font-size: 1rem;
+            margin-top: 10px;
+        }
+
+        .api-input:focus {
+            outline: none;
+            box-shadow: 0 0 20px rgba(255,255,255,0.5);
+        }
+
+        .mode-selector {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .mode-option {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 25px;
+            padding: 15px 25px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            font-size: 1rem;
+            text-align: center;
+            min-width: 200px;
+        }
+
+        .mode-option:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .mode-option.active {
+            background: rgba(255,255,255,0.3);
+            border-color: rgba(255,255,255,0.6);
+            box-shadow: 0 0 20px rgba(255,255,255,0.3);
+        }
+
+        .input-section {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.5s ease;
+        }
+
+        .input-label {
+            color: white;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            display: block;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .text-input {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.9);
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .text-input:focus {
+            outline: none;
+            box-shadow: 0 0 20px rgba(255,255,255,0.5);
+        }
+
+        .color-picker-section {
+            display: none;
+        }
+
+        .color-pickers {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .color-picker-item {
+            text-align: center;
+        }
+
+        .color-input {
+            width: 80px;
+            height: 80px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .color-input:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .color-label {
+            color: white;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .translate-button {
+            display: block;
+            width: 300px;
+            margin: 0 auto;
+            padding: 18px 30px;
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .translate-button:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.3);
+        }
+
+        .translate-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .output-section {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            display: none;
+        }
+
+        .output-section.show {
+            display: block;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .output-label {
+            color: white;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .output-content {
+            background: rgba(255,255,255,0.9);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .output-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .output-text {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #333;
+            font-style: italic;
+        }
+
+        .input-display {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .loader {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .loader.show {
+            display: block;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        .loader-text {
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        .error-message {
+            background: rgba(255,0,0,0.1);
+            border: 1px solid rgba(255,0,0,0.3);
+            border-radius: 10px;
+            padding: 15px;
+            color: #ff6b6b;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        .warning {
+            background: rgba(255,193,7,0.1);
+            border: 1px solid rgba(255,193,7,0.3);
+            border-radius: 10px;
+            padding: 15px;
+            color: #ffc107;
+            margin: 20px 0;
+            font-size: 0.9rem;
+        }
+
+        /* Background transitions for different modes */
+        .mode-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .mode-color {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2rem;
+            }
+            
+            .mode-selector {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .mode-option {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .translate-button {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .color-pickers {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body class="mode-text">
+    <div class="container">
+        <div class="header">
+            <h1 class="title">AI Synesthesia Simulator</h1>
+            <p class="subtitle">Experience the magic of translating between senses through AI</p>
+        </div>
+
+        <div class="api-section">
+            <label for="apiKey" style="color: white; font-size: 1.1rem;">Google API Key:</label>
+            <input type="password" id="apiKey" class="api-input" placeholder="Enter your Google API key to begin the synesthetic journey...">
+            <div class="warning">
+                ⚠️ Your API key is stored locally in your browser and never sent to any server except Google's API.
+            </div>
+        </div>
+
+        <div class="mode-selector">
+            <div class="mode-option active" data-mode="text">
+                <div>📝 ➜ 🎨</div>
+                <div>Text to Abstract Art</div>
+            </div>
+            <div class="mode-option" data-mode="color">
+                <div>🎨 ➜ ✍️</div>
+                <div>Colors to Evocative Text</div>
+            </div>
+        </div>
+
+        <div class="input-section">
+            <div id="textInput" class="text-input-section">
+                <label class="input-label">Enter your text to visualize:</label>
+                <textarea class="text-input" id="textContent" placeholder="Enter a poem, phrase, feeling, or any text that you'd like to see transformed into abstract art..."></textarea>
+            </div>
+
+            <div id="colorInput" class="color-picker-section">
+                <label class="input-label">Select 3-4 colors that speak to you:</label>
+                <div class="color-pickers">
+                    <div class="color-picker-item">
+                        <input type="color" class="color-input" id="color1" value="#ff6b6b">
+                        <div class="color-label">Color 1</div>
+                    </div>
+                    <div class="color-picker-item">
+                        <input type="color" class="color-input" id="color2" value="#4ecdc4">
+                        <div class="color-label">Color 2</div>
+                    </div>
+                    <div class="color-picker-item">
+                        <input type="color" class="color-input" id="color3" value="#45b7d1">
+                        <div class="color-label">Color 3</div>
+                    </div>
+                    <div class="color-picker-item">
+                        <input type="color" class="color-input" id="color4" value="#f9ca24">
+                        <div class="color-label">Color 4</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button class="translate-button" id="translateBtn">
+            🌈 Translate My Senses! 🌈
+        </button>
+
+        <div class="loader" id="loader">
+            <div class="spinner"></div>
+            <div class="loader-text">The AI is experiencing your input through different senses...</div>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+
+        <div class="output-section" id="outputSection">
+            <div class="output-label">Your Input:</div>
+            <div class="input-display" id="inputDisplay"></div>
+            
+            <div class="output-label">AI's Synesthetic Interpretation:</div>
+            <div class="output-content" id="outputContent"></div>
+        </div>
+    </div>
+
+    <script>
+        class SynesthesiaSimulator {
+            constructor() {
+                this.currentMode = 'text';
+                this.apiKey = localStorage.getItem('synesthesia_api_key') || '';
+                this.initializeElements();
+                this.setupEventListeners();
+                this.loadApiKey();
+            }
+
+            initializeElements() {
+                this.apiKeyInput = document.getElementById('apiKey');
+                this.modeButtons = document.querySelectorAll('.mode-option');
+                this.textInputSection = document.getElementById('textInput');
+                this.colorInputSection = document.getElementById('colorInput');
+                this.textContent = document.getElementById('textContent');
+                this.colorInputs = [
+                    document.getElementById('color1'),
+                    document.getElementById('color2'),
+                    document.getElementById('color3'),
+                    document.getElementById('color4')
+                ];
+                this.translateButton = document.getElementById('translateBtn');
+                this.loader = document.getElementById('loader');
+                this.errorMessage = document.getElementById('errorMessage');
+                this.outputSection = document.getElementById('outputSection');
+                this.inputDisplay = document.getElementById('inputDisplay');
+                this.outputContent = document.getElementById('outputContent');
+            }
+
+            setupEventListeners() {
+                // API key input
+                this.apiKeyInput.addEventListener('input', (e) => {
+                    this.apiKey = e.target.value;
+                    localStorage.setItem('synesthesia_api_key', this.apiKey);
+                });
+
+                // Mode selection
+                this.modeButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        this.switchMode(button.dataset.mode);
+                    });
+                });
+
+                // Translate button
+                this.translateButton.addEventListener('click', () => {
+                    this.translateSenses();
+                });
+
+                // Enter key for text input
+                this.textContent.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && e.ctrlKey) {
+                        this.translateSenses();
+                    }
+                });
+            }
+
+            loadApiKey() {
+                if (this.apiKey) {
+                    this.apiKeyInput.value = this.apiKey;
+                }
+            }
+
+            switchMode(mode) {
+                console.log(`Switching to mode: ${mode}`);
+                this.currentMode = mode;
+                
+                // Update active button
+                this.modeButtons.forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.mode === mode);
+                });
+
+                // Update background
+                document.body.className = `mode-${mode}`;
+
+                // Show/hide input sections
+                if (mode === 'text') {
+                    this.textInputSection.style.display = 'block';
+                    this.colorInputSection.style.display = 'none';
+                } else if (mode === 'color') {
+                    this.textInputSection.style.display = 'none';
+                    this.colorInputSection.style.display = 'block';
+                }
+
+                // Hide previous output
+                this.outputSection.classList.remove('show');
+            }
+
+            async translateSenses() {
+                if (!this.validateInputs()) return;
+
+                this.showLoader();
+                this.hideError();
+                this.translateButton.disabled = true;
+
+                try {
+                    if (this.currentMode === 'text') {
+                        await this.textToImage();
+                    } else if (this.currentMode === 'color') {
+                        await this.colorsToText();
+                    }
+                } catch (error) {
+                    console.error('Translation error:', error);
+                    this.showError(`Error during translation: ${error.message}`);
+                } finally {
+                    this.hideLoader();
+                    this.translateButton.disabled = false;
+                }
+            }
+
+            validateInputs() {
+                if (!this.apiKey.trim()) {
+                    this.showError('Please enter your Google API key first.');
+                    return false;
+                }
+
+                if (this.currentMode === 'text') {
+                    if (!this.textContent.value.trim()) {
+                        this.showError('Please enter some text to translate.');
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            async textToImage() {
+                const userText = this.textContent.value.trim();
+                console.log('Converting text to image:', userText);
+
+                const prompt = `Visually interpret the following text as an abstract piece of art. Focus on conveying the mood, rhythm, texture, and emotional essence rather than literal objects or scenes. The output should be a non-representational, evocative image that captures the feeling and atmosphere of the text. Create something that would make someone feel the same emotions as the original text, but through pure visual abstraction - think colors, shapes, textures, and composition rather than recognizable objects. Text for interpretation: "${userText}"`;
+
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${this.apiKey}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: prompt
+                            }]
+                        }],
+                        generationConfig: {
+                            temperature: 0.8,
+                            topK: 40,
+                            topP: 0.95,
+                            maxOutputTokens: 1024,
+                            responseMimeType: "image/jpeg"
+                        }
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`API Error: ${errorData.error?.message || response.statusText}`);
+                }
+
+                const data = await response.json();
+                console.log('API Response:', data);
+
+                if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0]) {
+                    const imageData = data.candidates[0].content.parts[0].inlineData;
+                    if (imageData && imageData.data) {
+                        this.displayImageResult(userText, imageData.data);
+                    } else {
+                        throw new Error('No image data received from API');
+                    }
+                } else {
+                    throw new Error('Unexpected API response format');
+                }
+            }
+
+            async colorsToText() {
+                const colors = this.colorInputs.map(input => input.value);
+                const colorNames = colors.map(color => this.getColorName(color));
+                console.log('Converting colors to text:', colors, colorNames);
+
+                const prompt = `You are a synesthetic poet and storyteller. Given the following color palette: ${colorNames.join(', ')} (hex values: ${colors.join(', ')}), write a short, evocative piece of text (a micro-poem, a brief scene description, or a tiny character sketch – 3-5 sentences) that captures the feeling, mood, or story these colors evoke when seen together. Be creative and metaphorical. Focus on the emotions, sensations, or narratives that this specific combination of colors brings to mind. Make it beautiful and poetic.`;
+
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${this.apiKey}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: prompt
+                            }]
+                        }],
+                        generationConfig: {
+                            temperature: 0.9,
+                            topK: 40,
+                            topP: 0.95,
+                            maxOutputTokens: 2048,
+                        }
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`API Error: ${errorData.error?.message || response.statusText}`);
+                }
+
+                const data = await response.json();
+                console.log('API Response:', data);
+
+                if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0]) {
+                    const generatedText = data.candidates[0].content.parts[0].text;
+                    this.displayTextResult(colors, generatedText);
+                } else {
+                    throw new Error('No text generated from API');
+                }
+            }
+
+            displayImageResult(originalText, imageData) {
+                this.inputDisplay.innerHTML = `<strong>Your Text:</strong><br>"${originalText}"`;
+                this.outputContent.innerHTML = `<img src="data:image/jpeg;base64,${imageData}" alt="AI Generated Abstract Art" class="output-image">`;
+                this.outputSection.classList.add('show');
+            }
+
+            displayTextResult(colors, generatedText) {
+                const colorSwatches = colors.map(color => 
+                    `<span style="display: inline-block; width: 30px; height: 30px; background-color: ${color}; border-radius: 50%; margin: 0 5px; vertical-align: middle; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2);"></span>`
+                ).join('');
+                
+                this.inputDisplay.innerHTML = `<strong>Your Color Palette:</strong><br>${colorSwatches}`;
+                this.outputContent.innerHTML = `<div class="output-text">${generatedText}</div>`;
+                this.outputSection.classList.add('show');
+            }
+
+            getColorName(hex) {
+                // Simple color name mapping for better prompts
+                const colorMap = {
+                    '#ff0000': 'red', '#00ff00': 'green', '#0000ff': 'blue',
+                    '#ffff00': 'yellow', '#ff00ff': 'magenta', '#00ffff': 'cyan',
+                    '#000000': 'black', '#ffffff': 'white', '#808080': 'gray',
+                    '#ffa500': 'orange', '#800080': 'purple', '#ffc0cb': 'pink',
+                    '#a52a2a': 'brown', '#008000': 'dark green', '#000080': 'navy'
+                };
+
+                // Find closest match or return hex
+                const closest = Object.keys(colorMap).find(color => 
+                    color.toLowerCase() === hex.toLowerCase()
+                );
+                
+                return closest ? colorMap[closest] : hex;
+            }
+
+            showLoader() {
+                this.loader.classList.add('show');
+            }
+
+            hideLoader() {
+                this.loader.classList.remove('show');
+            }
+
+            showError(message) {
+                this.errorMessage.textContent = message;
+                this.errorMessage.classList.add('show');
+            }
+
+            hideError() {
+                this.errorMessage.classList.remove('show');
+            }
+        }
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('AI Synesthesia Simulator loading...');
+            new SynesthesiaSimulator();
+        });
+    </script>
+</body>
 </html>
